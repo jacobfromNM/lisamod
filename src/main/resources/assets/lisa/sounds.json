@@ -1,0 +1,137 @@
+{
+  "lady_1": {
+    "subtitle": "subtitles.lisa.lady",
+    "sounds": [
+      {
+        "name": "lisa:lady_1",
+        "stream": false
+      }
+    ]
+  },
+  "lady_2": {
+    "subtitle": "subtitles.lisa.lady",
+    "sounds": [
+      {
+        "name": "lisa:lady_2",
+        "stream": false
+      }
+    ]
+  },
+  "lady_3": {
+    "subtitle": "subtitles.lisa.lady",
+    "sounds": [
+      {
+        "name": "lisa:lady_3",
+        "stream": false
+      }
+    ]
+  },
+  "lady_4": {
+    "subtitle": "subtitles.lisa.lady",
+    "sounds": [
+      {
+        "name": "lisa:lady_4",
+        "stream": false
+      }
+    ]
+  },
+  "lady_5": {
+    "subtitle": "subtitles.lisa.lady",
+    "sounds": [
+      {
+        "name": "lisa:lady_5",
+        "stream": false
+      }
+    ]
+  },
+  "baby_1": {
+    "subtitle": "subtitles.lisa.baby",
+    "sounds": [
+      {
+        "name": "lisa:baby_1",
+        "stream": false
+      }
+    ]
+  },
+  "baby_2": {
+    "subtitle": "subtitles.lisa.baby",
+    "sounds": [
+      {
+        "name": "lisa:baby_2",
+        "stream": false
+      }
+    ]
+  },
+  "baby_3": {
+    "subtitle": "subtitles.lisa.baby",
+    "sounds": [
+      {
+        "name": "lisa:baby_3",
+        "stream": false
+      }
+    ]
+  },
+  "baby_4": {
+    "subtitle": "subtitles.lisa.baby",
+    "sounds": [
+      {
+        "name": "lisa:baby_4",
+        "stream": false
+      }
+    ]
+  },
+  "baby_5": {
+    "subtitle": "subtitles.lisa.baby",
+    "sounds": [
+      {
+        "name": "lisa:baby_5",
+        "stream": false
+      }
+    ]
+  },
+  "ambient_1": {
+    "subtitle": "subtitles.lisa.ambient",
+    "sounds": [
+      {
+        "name": "lisa:ambient_1",
+        "stream": false
+      }
+    ]
+  },
+  "ambient_2": {
+    "subtitle": "subtitles.lisa.ambient",
+    "sounds": [
+      {
+        "name": "lisa:ambient_2",
+        "stream": false
+      }
+    ]
+  },
+  "ambient_3": {
+    "subtitle": "subtitles.lisa.ambient",
+    "sounds": [
+      {
+        "name": "lisa:ambient_3",
+        "stream": false
+      }
+    ]
+  },
+  "appear": {
+    "subtitle": "subtitles.lisa.appear",
+    "sounds": [
+      {
+        "name": "lisa:appear",
+        "stream": false
+      }
+    ]
+  },
+  "look_behind_you": {
+    "subtitle": "subtitles.lisa.look",
+    "sounds": [
+      {
+        "name": "lisa:look_behind_you",
+        "stream": false
+      }
+    ]
+  }
+}
