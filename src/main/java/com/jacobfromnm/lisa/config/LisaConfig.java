@@ -120,8 +120,8 @@ public class LisaConfig {
 
                 SPAWN_CHANCE = builder
                                 .comment("Chance per check (every 100 ticks) that Lisa will spawn near a qualifying player.",
-                                                "Note: Range: 0.0 to 1.0  (Default: 0.001 (rare))")
-                                .defineInRange("spawnChance", 0.001, 0.0, 1.0);
+                                                "Note: Range: 0.0 to 1.0  (Default: 0.01 (uncommon))")
+                                .defineInRange("spawnChance", 0.01, 0.0, 1.0);
 
                 SPAWN_COOLDOWN_TICKS = builder
                                 .comment("Minimum ticks between Lisa spawn events per player.",
@@ -149,8 +149,8 @@ public class LisaConfig {
 
                 PHASE2_CHANCE = builder
                                 .comment("Chance that Lisa teleports behind the player after the lurk delay.",
-                                                "Note: Range: 0.0 to 1.0  (Default: 0.05 (5%))")
-                                .defineInRange("phase2Chance", 0.05, 0.0, 1.0);
+                                                "Note: Range: 0.0 to 1.0  (Default: 0.01 (1%))")
+                                .defineInRange("phase2Chance", 0.01, 0.0, 1.0);
 
                 PHASE2_LINGER_TICKS = builder
                                 .comment("Ticks Lisa stays directly behind the player before despawning if never spotted.",
@@ -170,8 +170,8 @@ public class LisaConfig {
                 AMBIENT_STALK_CHANCE = builder
                                 .comment("Chance that Lisa enters ambient-stalk mode when she spawns (instead of normal lurking).",
                                                 "In this mode she silently tracks the player from behind, plays one ambient sound, then vanishes.",
-                                                "Note: Range: 0.0 to 1.0  (Default: 0.10 (10%))")
-                                .defineInRange("ambientStalkChance", 0.10, 0.0, 1.0);
+                                                "Note: Range: 0.0 to 1.0  (Default: 0.1 (10%))")
+                                .defineInRange("ambientStalkChance", 0.1, 0.0, 1.0);
 
                 AMBIENT_STALK_DURATION_TICKS = builder
                                 .comment("Ticks Lisa stays behind the player during an ambient stalk before despawning.",
