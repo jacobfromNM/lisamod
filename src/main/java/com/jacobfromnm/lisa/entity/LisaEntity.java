@@ -3,6 +3,7 @@ package com.jacobfromnm.lisa.entity;
 import com.jacobfromnm.lisa.LisaMod;
 import com.jacobfromnm.lisa.config.LisaConfig;
 import com.jacobfromnm.lisa.registry.ModSounds;
+import javax.annotation.Nonnull;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -199,6 +200,18 @@ public class LisaEntity extends PathfinderMob {
         // Apply darkness effect each tick
         applyDarknessEffect(player);
 
+        // Resolve grab sequence before phase dispatch so it fires from any phase
+        if (grabbing) {
+            grabTicks++;
+            if (grabTicks >= GRAB_DURATION) {
+                if (LisaConfig.ENABLE_LOGGING.get())
+                    LisaMod.LOGGER.info("[Lisa] Killed player '{}' — despawning", player.getName().getString());
+                player.kill();
+                this.discard();
+            }
+            return;
+        }
+
         // Delegate to whichever phase is active
         switch (phase) {
             case LURKING -> handleLurking(player);
@@ -219,6 +232,15 @@ public class LisaEntity extends PathfinderMob {
      * @param player the nearest player within range
      */
     private void handleLurking(Player player) {
+        // Proximity trigger: player got within 3 blocks of Lisa while she was lurking
+        if (this.distanceTo(player) <= 3.0) {
+            if (LisaConfig.ENABLE_LOGGING.get())
+                LisaMod.LOGGER.info("[Lisa] Player '{}' too close during LURKING — triggering grab",
+                        player.getName().getString());
+            triggerGrab(player);
+            return;
+        }
+
         // On the very first tick, roll to decide if this becomes a harmless
         // ambient-stalk event
         if (ticksAlive == 1) {
@@ -295,20 +317,6 @@ public class LisaEntity extends PathfinderMob {
      * @param player the player Lisa is standing behind
      */
     private void handleBehindPlayer(Player player) {
-        // During the grab sequence, count down to damage and skip all other checks
-        if (grabbing) {
-            grabTicks++;
-            if (grabTicks >= GRAB_DURATION) {
-                float damage = LisaConfig.LOOK_DAMAGE.get().floatValue();
-                player.hurt(DamageSource.mobAttack(this), damage);
-                if (LisaConfig.ENABLE_LOGGING.get())
-                    LisaMod.LOGGER.info("[Lisa] Dealt {} damage to player '{}' — despawning", damage,
-                            player.getName().getString());
-                this.discard();
-            }
-            return;
-        }
-
         phase2Ticks++;
 
         // Despawn if the player never turns around within the linger window
@@ -325,19 +333,7 @@ public class LisaEntity extends PathfinderMob {
             if (LisaConfig.ENABLE_LOGGING.get())
                 LisaMod.LOGGER.info("[Lisa] Player '{}' looked at Lisa — beginning grab sequence",
                         player.getName().getString());
-            grabbing = true;
-            grabTicks = 0;
-            // Teleport to the player so the hit lands even if they move
-            this.teleportTo(player.getX(), player.getY(), player.getZ());
-            // Louder, pitched-down scream — deeper and more unsettling than the default
-            this.level.playSound(null,
-                    player.getX(), player.getY(), player.getZ(),
-                    ModSounds.APPEAR.get(), SoundSource.HOSTILE, 3.0f, 0.85f);
-            if (LisaConfig.ENABLE_LOGGING.get())
-                LisaMod.LOGGER.info("[Lisa] Playing sound: appear (grab)");
-            // Brief blindness flash + heavy slowness — the P.T. freeze-and-grab feeling
-            player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, GRAB_DURATION, 0, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, GRAB_DURATION + 5, 5, false, false));
+            triggerGrab(player);
         }
     }
 
@@ -429,6 +425,24 @@ public class LisaEntity extends PathfinderMob {
         this.yHeadRot = yaw;
     }
 
+    /**
+     * Initiates the grab sequence: teleports Lisa onto the player, plays the
+     * scream, and applies blindness + heavy slowness. The kill fires
+     * {@link #GRAB_DURATION} ticks later in {@link #tick()}.
+     */
+    private void triggerGrab(Player player) {
+        grabbing = true;
+        grabTicks = 0;
+        this.teleportTo(player.getX(), player.getY(), player.getZ());
+        this.level.playSound(null,
+                player.getX(), player.getY(), player.getZ(),
+                ModSounds.APPEAR.get(), SoundSource.HOSTILE, 3.0f, 0.85f);
+        if (LisaConfig.ENABLE_LOGGING.get())
+            LisaMod.LOGGER.info("[Lisa] Playing sound: appear (grab)");
+        player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, GRAB_DURATION, 0, false, false));
+        player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, GRAB_DURATION + 5, 5, false, false));
+    }
+
     private void teleportBehindPlayer(Player player) {
         Vec3 look = player.getLookAngle();
         // Negate the look vector to get the "behind" direction, scale by 2 blocks
@@ -501,6 +515,21 @@ public class LisaEntity extends PathfinderMob {
     // -------------------------------------------------------------------------
     // Invulnerability & collision overrides
     // -------------------------------------------------------------------------
+
+    /**
+     * Intercepts any attack on Lisa. If a player hits her while she is LURKING,
+     * the grab sequence triggers immediately. Lisa remains invulnerable regardless.
+     */
+    @Override
+    public boolean hurt(@Nonnull DamageSource source, float amount) {
+        if (phase == Phase.LURKING && !grabbing && source.getEntity() instanceof Player player) {
+            if (LisaConfig.ENABLE_LOGGING.get())
+                LisaMod.LOGGER.info("[Lisa] Player '{}' attacked Lisa during LURKING — triggering grab",
+                        player.getName().getString());
+            triggerGrab(player);
+        }
+        return false;
+    }
 
     /**
      * Makes Lisa completely immune to all damage sources.
