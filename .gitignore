@@ -27,7 +27,7 @@ forge*changelog.txt
 # Build & gradle files (not published to repo)
 build.gradle
 settings.gradle
-gradle.properties
+
 gradlew
 gradlew.bat
 gradle/

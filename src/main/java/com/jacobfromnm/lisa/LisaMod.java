@@ -1,6 +1,7 @@
 package com.jacobfromnm.lisa;
 
 import com.jacobfromnm.lisa.config.LisaConfig;
+import com.jacobfromnm.lisa.config.LisaConfigScreen;
 import com.jacobfromnm.lisa.entity.LisaEntity;
 import com.jacobfromnm.lisa.entity.LisaModel;
 import com.jacobfromnm.lisa.entity.LisaRenderer;
@@ -9,13 +10,17 @@ import com.jacobfromnm.lisa.registry.ModLayers;
 import com.jacobfromnm.lisa.registry.ModSounds;
 import com.mojang.logging.LogUtils;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
@@ -53,6 +58,8 @@ public class LisaMod {
 
         // Hook into the attribute-creation event so Lisa gets her stats (health, speed, etc.)
         modEventBus.addListener(this::onAttributeCreate);
+        modEventBus.addListener(this::onClientSetup);
+        modEventBus.addListener(this::onConfigLoad);
 
         // Register the config file so Forge generates lisa-common.toml in the config folder
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, LisaConfig.SPEC);
@@ -67,6 +74,21 @@ public class LisaMod {
     private void onAttributeCreate(EntityAttributeCreationEvent event) {
         // Link Lisa's entity type to her attribute set (health, speed, follow range)
         event.put(ModEntities.LISA.get(), LisaEntity.createAttributes().build());
+    }
+
+    private void onClientSetup(FMLClientSetupEvent event) {
+        if (ModList.get().isLoaded("cloth_config")) {
+            ModLoadingContext.get().registerExtensionPoint(
+                ConfigScreenHandler.ConfigScreenFactory.class,
+                () -> new ConfigScreenHandler.ConfigScreenFactory((mc, parent) -> LisaConfigScreen.create(parent))
+            );
+        }
+    }
+
+    private void onConfigLoad(ModConfigEvent.Loading event) {
+        if (event.getConfig().getSpec() == LisaConfig.SPEC) {
+            LisaConfig.onLoad(event.getConfig());
+        }
     }
 
     // -------------------------------------------------------------------------
